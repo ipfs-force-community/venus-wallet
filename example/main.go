@@ -2,11 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/filecoin-project/venus-wallet/api/remotecli"
-	"github.com/filecoin-project/venus-wallet/api/remotecli/httpparse"
-	"github.com/filecoin-project/venus-wallet/core"
-	"github.com/filecoin-project/venus-wallet/storage/wallet"
-	"golang.org/x/xerrors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +10,14 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/filecoin-project/venus-wallet/crypto"
+
+	"github.com/filecoin-project/venus-wallet/api/remotecli"
+	"github.com/filecoin-project/venus-wallet/api/remotecli/httpparse"
+	"github.com/filecoin-project/venus-wallet/core"
+	"github.com/filecoin-project/venus-wallet/storage/wallet"
+	"golang.org/x/xerrors"
 )
 
 type RemoteWallet struct {
@@ -112,6 +115,15 @@ func main() {
 		log.Fatalf("remote wallet check address exist error:%s", err)
 	}
 	log.Printf("addr:%s exist:%v", addr.String(), exist)
+	sig, err := remoteWallet.WalletSign(context.Background(), addr, core.FixedSignBytes, core.MsgMeta{Type: core.MTVerifyAddress})
+	if err != nil {
+		log.Fatalf("wallet sign: %v", err)
+	}
+	err = crypto.Verify(sig, addr, core.FixedSignBytes)
+	if err != nil {
+		log.Fatalf("verify signature: %v", err)
+	}
+
 	remoteWallet.Cancel()
 	err = syscall.Kill(pid, 9)
 	if err != nil {

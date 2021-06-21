@@ -3,11 +3,12 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/go-state-types/crypto"
 	"github.com/ipfs/go-cid"
-	"math"
 )
 
 const StringEmpty = ""
@@ -20,6 +21,8 @@ const (
 	SigTypeSecp256k1 = SigType(iota)
 	SigTypeBLS
 )
+
+var FixedSignBytes = []byte("verify_address")
 
 type AddressScope struct {
 	Root      bool      // is root auth,  true : can get all addresses in the wallet
