@@ -115,11 +115,11 @@ func main() {
 		log.Fatalf("remote wallet check address exist error:%s", err)
 	}
 	log.Printf("addr:%s exist:%v", addr.String(), exist)
-	sig, err := remoteWallet.WalletSign(context.Background(), addr, core.FixedSignBytes, core.MsgMeta{Type: core.MTVerifyAddress})
+	sig, err := remoteWallet.WalletSign(context.Background(), addr, core.RandSignBytes, core.MsgMeta{Type: core.MTVerifyAddress})
 	if err != nil {
 		log.Fatalf("wallet sign: %v", err)
 	}
-	err = crypto.Verify(sig, addr, core.FixedSignBytes)
+	err = crypto.Verify(sig, addr, core.RandSignBytes)
 	if err != nil {
 		log.Fatalf("verify signature: %v", err)
 	}

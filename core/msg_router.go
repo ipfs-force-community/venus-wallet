@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"reflect"
 
@@ -14,6 +15,8 @@ import (
 	"github.com/filecoin-project/specs-actors/v2/actors/builtin/paych"
 	"golang.org/x/xerrors"
 )
+
+var hash256 = sha256.New()
 
 // Abstract data types to be signed
 type Types struct {
@@ -93,14 +96,14 @@ var SupportedMsgTypes = map[MsgType]*Types{
 	MTVerifyAddress: {
 		Type: reflect.TypeOf([]byte{}),
 		signBytes: func(in interface{}) ([]byte, error) {
-			data := in.([]byte)
-			// check sign data
-			if !bytes.Equal(data, FixedSignBytes) {
-				return nil, xerrors.Errorf("need %s, have: %s", FixedSignBytes, data)
-			}
-			return data, nil
+			return in.([]byte), nil
 		},
 		parseObj: func(in []byte, meta MsgMeta) (interface{}, error) {
+			expected := hash256.Sum(append(meta.Extra, RandSignBytes...))
+			if !bytes.Equal(in, expected) {
+				return nil, xerrors.Errorf("sign data not match, actual %v, expected %v", in, expected)
+			}
+
 			return in, nil
 		},
 	},
