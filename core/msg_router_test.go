@@ -1,9 +1,7 @@
 package core
 
 import (
-	"bytes"
 	"encoding/hex"
-	"fmt"
 	"testing"
 )
 
@@ -30,17 +28,4 @@ func TestGetSignBytes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	_, toSign, err := GetSignBytes(RandSignBytes, MsgMeta{Type: MTVerifyAddress})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !bytes.Equal(toSign, RandSignBytes) {
-		t.Fatalf("sign bytes mismatch, need %v, have: %v", RandSignBytes, toSign)
-	}
-
-	_, _, err = GetSignBytes([]byte("x"), MsgMeta{Type: MTVerifyAddress})
-	fmt.Println(err)
-	// output:
-	// need ${RandSignBytes}, have: x
 }
